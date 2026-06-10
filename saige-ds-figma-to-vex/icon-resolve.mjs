@@ -17,7 +17,8 @@
  *   node icon-resolve.mjs --dts <path> ...   # 레지스트리 .d.ts 경로 override
  */
 
-import { readFileSync } from 'node:fs';
+import { readFileSync, realpathSync } from 'node:fs';
+import { fileURLToPath } from 'node:url';
 import { iconsDts } from '../_shared/saige-paths.mjs';
 
 // 경로는 _shared/saige-paths.mjs가 해석 (env SAIGE_ICONS_DTS / SAIGE_DS_ROOT → homedir 폴백)
@@ -122,4 +123,6 @@ function main() {
 }
 
 // 직접 실행 시에만 CLI 동작 (import 시엔 resolveIcon만 노출)
-if (import.meta.url === `file://${process.argv[1]}`) main();
+// 심볼릭 링크로 설치돼도 동작하도록 realpath로 비교 (argv[1]은 심볼릭 경로일 수 있음)
+const __invoked = process.argv[1] ? realpathSync(process.argv[1]) : '';
+if (__invoked === fileURLToPath(import.meta.url)) main();

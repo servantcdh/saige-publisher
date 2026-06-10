@@ -20,6 +20,22 @@ Figma 시안을 SAIGE 코드(design-system / safety-frontend)로 **반자동 퍼
 2. 리포 클론: `design-system`, `safety-frontend`
 3. design-system에 의존성 설치 (`pnpm install`) — `@saige-ai/icons` 필요 (아이콘 resolver 권위 소스)
 
+## 설치 (권장 — `install.sh`)
+
+이 레포를 별도 위치에 클론한 뒤 `install.sh` 한 번 실행:
+```bash
+git clone <repo-url> ~/dev/saige-publisher   # private — 레포 소유자에게 접근권 요청
+cd ~/dev/saige-publisher
+./install.sh
+```
+`install.sh`가 하는 일:
+- 스킬 디렉토리를 `~/.claude/skills/`에 **심볼릭 링크** (git pull 시 자동 반영. 심볼릭 경유 실행도 동작)
+- PR 게이트 hook(`hooks/pre-pr-create-check.sh`) 설치 + settings 등록 스니펫 출력
+- 환경변수 템플릿 출력 + resolver 3종 검증
+- 멱등(재실행 안전). 비표준 위치는 `CLAUDE_SKILLS_DIR`/`CLAUDE_HOOKS_DIR`로 override.
+
+설치 후 **Claude Code 재시작** → 스킬 스캔. PR 게이트 강제하려면 출력된 스니펫을 `settings.json` `hooks.PreToolUse`에 추가.
+
 ## 경로 설정 (이식성)
 
 모든 경로는 **`_shared/saige-paths.mjs` 한 곳**에서 해석한다. 하드코딩 없음.

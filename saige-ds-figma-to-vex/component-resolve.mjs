@@ -18,8 +18,9 @@
  *   node component-resolve.mjs --json --root <design-system path> "Switch"
  */
 
-import { readFileSync, readdirSync, statSync } from 'node:fs';
+import { readFileSync, readdirSync, statSync, realpathSync } from 'node:fs';
 import { join, relative } from 'node:path';
+import { fileURLToPath } from 'node:url';
 import { dsRoot } from '../_shared/saige-paths.mjs';
 
 // 경로는 _shared/saige-paths.mjs가 해석 (env SAIGE_DS_ROOT → homedir 폴백)
@@ -138,4 +139,6 @@ function main() {
   if (un.length) console.log('→ unresolved는 추정 import 금지. 사용자에게 확인 질문(누락 DS 컴포넌트인지/오타인지).');
 }
 
-if (import.meta.url === `file://${process.argv[1]}`) main();
+// 심볼릭 링크로 설치돼도 동작하도록 realpath로 비교 (argv[1]은 심볼릭 경로일 수 있음)
+const __invoked = process.argv[1] ? realpathSync(process.argv[1]) : '';
+if (__invoked === fileURLToPath(import.meta.url)) main();
