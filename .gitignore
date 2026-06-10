@@ -1,0 +1,5 @@
+.DS_Store
+node_modules/
+# 머신/사용자별 로컬 경로 설정 (이식성 — 각자 작성, 커밋 X)
+*.local.json
+saige-paths.local.*
