@@ -56,6 +56,7 @@ Classify nodes as:
 Use naming hints (optional convention — see project CLAUDE.md):
 - @screen
 - @component
+- @variant (Component Set variant cell)
 - @flow
 - @ignore
 - @wip
