@@ -49,7 +49,7 @@ Figma 시안과 Storybook 구현 사이의 시각 정합도를 픽셀 단위로 
 - **Vercel preview 사용 금지** — design-system 리포의 Vercel project는 이정남님 개인 계정(Jay Lee's projects) 소속이라 본인 권한 X. 우회 시도(`get_access_to_vercel_url`)도 실패. Vercel preview는 PD 비동기 공유 용도만.
 - **로컬 Storybook 표준**:
   ```bash
-  cd /Users/donghochoi/Documents/design-system
+  cd $SAIGE_DS_ROOT
   pnpm storybook  # 백그라운드, port 6006
   # ready 대기
   until curl -s -o /dev/null -w "%{http_code}" http://localhost:6006 2>&1 | grep -q "200\|302"; do sleep 3; done

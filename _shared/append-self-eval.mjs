@@ -26,9 +26,10 @@
  */
 
 import { readFileSync, writeFileSync } from 'node:fs';
+import { selfEvalLog } from './saige-paths.mjs';
 
-const DEFAULT_LOG =
-  '/Users/donghochoi/.claude/projects/-Users-donghochoi-Documents-safety-frontend/memory/_self_evaluation_log.json';
+// 경로는 saige-paths.mjs가 해석 (env SAIGE_SELF_EVAL_LOG → 동호님 기본값 폴백)
+const DEFAULT_LOG = selfEvalLog;
 
 // ---- arg 파싱 (의존성 0) ----
 function parseArgs(argv) {

@@ -18,9 +18,10 @@
  */
 
 import { readFileSync } from 'node:fs';
+import { iconsDts } from '../_shared/saige-paths.mjs';
 
-const DEFAULT_DTS =
-  '/Users/donghochoi/Documents/design-system/node_modules/@saige-ai/icons/dist/index.d.ts';
+// 경로는 _shared/saige-paths.mjs가 해석 (env SAIGE_ICONS_DTS / SAIGE_DS_ROOT → homedir 폴백)
+const DEFAULT_DTS = iconsDts;
 
 // 검증된 의미 불일치만 등재 (예: Figma명과 export명이 어휘적으로 다른 경우).
 // 비어 있는 게 기본 — 추정 alias보다 UNRESOLVED가 안전.

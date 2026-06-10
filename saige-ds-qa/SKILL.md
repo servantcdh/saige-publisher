@@ -192,7 +192,7 @@ src/components/<category>/<component-name>/
 
 ## 참조
 
-- CLAUDE.md SSOT: `/Users/donghochoi/Documents/design-system/CLAUDE.md`
+- CLAUDE.md SSOT: `$SAIGE_DS_ROOT/CLAUDE.md`
 - 본인 메모리: [[ds-claude-md-ssot]] / [[feedback-ds-knip-unused]] / [[ds-component-standard]] / [[ds-datagrid-v2-decisions]]
 
 ## 변경 이력

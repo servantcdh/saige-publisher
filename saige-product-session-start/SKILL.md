@@ -17,7 +17,7 @@ safety-frontend 작업 착수 시 본인이 알아야 할 컨텍스트를 자동
 
 ### 1. safety-frontend CLAUDE.md SSOT
 - 본인 메모리 [[safety-frontend-claude-md-ssot]] 우선 활용
-- 메모리 outdated 의심 시 `/Users/donghochoi/Documents/safety-frontend/CLAUDE.md` 직접 read
+- 메모리 outdated 의심 시 `$SAIGE_SF_ROOT/CLAUDE.md` 직접 read
 - 12개 핵심 항목 요약 출력
 
 ### 2. 본인 관련 메모리

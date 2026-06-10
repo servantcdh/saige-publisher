@@ -20,8 +20,10 @@
 
 import { readFileSync, readdirSync, statSync } from 'node:fs';
 import { join, relative } from 'node:path';
+import { dsRoot } from '../_shared/saige-paths.mjs';
 
-const DEFAULT_ROOT = '/Users/donghochoi/Documents/design-system';
+// 경로는 _shared/saige-paths.mjs가 해석 (env SAIGE_DS_ROOT → homedir 폴백)
+const DEFAULT_ROOT = dsRoot;
 const HELPER_MARKERS = ['⚡️', '🪄', '🔁']; // Figma 오서링 헬퍼/슬롯 마커
 // 마커 없이도 헬퍼로 취급하는 알려진 Figma 패턴 이름
 const HELPER_NAMES = new Set(['Text Decorator', 'Icon Wrapper', 'Switch Group', 'Button Group', 'Slot']);

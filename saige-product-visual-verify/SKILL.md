@@ -30,7 +30,7 @@ safety-frontend 작업물의 시각 정합도 측정. DS의 `saige-ds-visual-ver
 ### 2단계 — Vite dev server 캡쳐 (페이지 단위)
 
 ```bash
-cd /Users/donghochoi/Documents/safety-frontend
+cd $SAIGE_SF_ROOT
 pnpm serve:qa  # 백그라운드, 보통 port 4200
 # ready 대기
 until curl -s -o /dev/null -w "%{http_code}" http://localhost:4200 2>&1 | grep -q "200\|302"; do sleep 3; done

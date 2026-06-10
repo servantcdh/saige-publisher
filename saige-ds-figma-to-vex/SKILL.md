@@ -255,7 +255,7 @@ export const title = style({
 
 ## 참조
 
-- SAIGE DS 토큰 구조: `/Users/donghochoi/Documents/design-system/src/tokens/{spacing,radius,theme.css,typography}.ts`
+- SAIGE DS 토큰 구조: `$SAIGE_DS_ROOT/src/tokens/{spacing,radius,theme.css,typography}.ts`
 - SDS-216 v2 구현 (검증된 실증 케이스): `src/components/data-display/data-grid/`
 - 출처 차용: `gbasin/figma-to-react` (MIT, Figma MCP + visual verify), Properly Studio 10 skills (MIT, DS 워크플로우 단계 분해)
 

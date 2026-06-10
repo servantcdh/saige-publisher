@@ -17,7 +17,7 @@ DS 컴포넌트 작업 착수 시점에 본인이 알아야 할 모든 컨텍스
 
 ### 1. CLAUDE.md SSOT
 - 본인 메모리 [[ds-claude-md-ssot]] 정독 결과 우선 활용
-- 메모리가 outdated면 `/Users/donghochoi/Documents/design-system/CLAUDE.md` 직접 read
+- 메모리가 outdated면 `$SAIGE_DS_ROOT/CLAUDE.md` 직접 read
 - 핵심 11개 항목 요약 출력
 
 ### 2. 본인 관련 메모리
