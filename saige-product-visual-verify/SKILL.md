@@ -105,15 +105,21 @@ node ~/.claude/skills/_shared/append-self-eval.mjs \
 
 ## 인증 우회 표준 (safety-frontend 특화, 2026-06-09 갱신)
 
-### ✅ 권장 — dev 계정 로그인 자동화 (admin/admin)
+### ✅ 권장 — dev 계정 로그인 자동화 (env 주입)
 
 본인 PoC 검증된 방법. mock token 우회는 BE API 호출 시 401 발생으로 폐기. **실제 dev 계정 로그인이 현실적 표준**.
 
+**자격증명은 env로 주입** — 파일에 평문 금지 (이 repo는 git 추적·원격 푸시됨):
+```bash
+export SAIGE_DEV_USER="<dev 계정 ID>"
+export SAIGE_DEV_PASS="<dev 계정 PW>"
+```
+
 ```typescript
-// Playwright spec — dev 계정 자동 로그인
+// Playwright spec — dev 계정 자동 로그인 (자격증명은 env에서)
 await page.goto('http://localhost:4200/login');
-await page.fill('input[name="username"]', 'admin');
-await page.fill('input[name="password"]', 'admin');
+await page.fill('input[name="username"]', process.env.SAIGE_DEV_USER ?? '');
+await page.fill('input[name="password"]', process.env.SAIGE_DEV_PASS ?? '');
 await page.click('button[type="submit"]');
 
 // 로그인 완료 대기
@@ -125,7 +131,7 @@ await page.waitForLoadState('networkidle');
 await page.screenshot({ path: '/tmp/visual-verify-poc/SAFETYPRD-xxx-actual.png' });
 ```
 
-⚠️ **본인 메모리에 평문 PW 저장 금지** (사용자 지시) — `admin/admin`은 dev 환경 한정 표준 계정이라 본인 메모리에 별도 저장 X. SKILL.md에 노출은 OK (skill 파일은 본인 메모리 git에 안 들어감).
+⚠️ **자격증명 평문 저장 금지** — 메모리에도 SKILL.md에도 평문 X. dev 환경 한정 계정이라도 이 repo가 git 추적·원격 푸시되므로 반드시 env(`SAIGE_DEV_USER`/`SAIGE_DEV_PASS`)로만 주입. (2026-06-10 갱신: 이전엔 "skill 파일은 git에 안 들어감" 전제로 평문 노출 OK였으나, git 저장소화로 전제 깨짐.)
 
 ### 폐기된 방법 — mock token 우회
 
@@ -170,5 +176,6 @@ API mock 필요한 케이스 (BE 미확정 영역) — MSW 별도 설정. 다만
 ## 변경 이력
 
 - v0.1 (2026-06-08): Product 트랙 일반화 + 인증 우회 표준 명시.
-- v0.2 (2026-06-09): G24/G25 갭 해소 — mock token 우회 폐기 + dev 계정(admin/admin) 자동 로그인이 표준. 카메라맵 PoC 사후학습.
+- v0.2 (2026-06-09): G24/G25 갭 해소 — mock token 우회 폐기 + dev 계정 자동 로그인이 표준. 카메라맵 PoC 사후학습.
+- v0.4 (2026-06-10): dev 자격증명 평문 제거 → env 주입(`SAIGE_DEV_USER`/`SAIGE_DEV_PASS`). git 저장소화로 "skill은 git에 안 들어감" 전제 깨짐.
 - v0.3 (2026-06-09): self-eval append 배선 — fidelity-score.json 산출(5단계, 그동안 미산출) + 6단계 헬퍼 호출 추가. DS 트랙과 동일 `append-self-eval.mjs` 공유. track:"product"로 구분.

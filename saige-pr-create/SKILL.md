@@ -102,7 +102,7 @@ discovery.md + Figma 캡쳐 기반 본인 실제 코드 작업:
 
 본인 manual 캡쳐 X. **visual-verify skill 자동 호출 강제**:
 - DS: `saige-ds-visual-verify` → 로컬 Storybook + Playwright 자동 캡쳐 + pixel diff
-- Product: `saige-product-visual-verify` → 로컬 Vite + dev 계정 자동 로그인(admin/admin) + Playwright 자동 캡쳐 + pixel diff
+- Product: `saige-product-visual-verify` → 로컬 Vite + dev 계정 자동 로그인(env 주입) + Playwright 자동 캡쳐 + pixel diff
 - 저장: `/tmp/visual-verify-poc/<TICKET>-storybook.png` (DS) 또는 `<TICKET>-actual.png` (Product)
 - **산출물 (★ hook 검증)**: `/tmp/visual-verify-poc/<TICKET>-fidelity-score.json` (정량 점수 + 본인 자칭 vs 실측 갭)
 

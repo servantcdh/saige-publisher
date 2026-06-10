@@ -35,6 +35,12 @@ export SAIGE_ICONS_DTS="$SAIGE_DS_ROOT/node_modules/@saige-ai/icons/dist/index.d
 export SAIGE_SELF_EVAL_LOG="/your/memory/_self_evaluation_log.json"
 ```
 
+**dev 자격증명** (Product visual-verify 로그인 자동화용) — 평문 파일 저장 금지, env로만:
+```bash
+export SAIGE_DEV_USER="<dev 계정 ID>"
+export SAIGE_DEV_PASS="<dev 계정 PW>"
+```
+
 ## 셋업 검증 (3개 resolver)
 
 ```bash
