@@ -68,7 +68,8 @@ ENVTPL
 echo "▶ 검증"
 
 # Figma MCP — ★ 가장 기본 전제 (Figma 데스크톱 Dev Mode MCP 서버)
-if curl -s -o /dev/null --max-time 3 http://127.0.0.1:3845/sse 2>/dev/null; then
+# 주의: /sse 는 스트리밍이라 curl이 안 닫혀 거짓 timeout. 루트(/)는 즉시 404 → 서버 살아있음 판정.
+if curl -s -o /dev/null --max-time 2 http://127.0.0.1:3845/ 2>/dev/null; then
   echo "  ✅ Figma Dev Mode MCP 서버 응답 (127.0.0.1:3845)"
 else
   echo "  ⚠️  Figma Dev Mode MCP 서버 미응답 — 퍼블리싱 불가!"
