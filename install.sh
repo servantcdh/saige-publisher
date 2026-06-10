@@ -64,8 +64,18 @@ cat <<'ENVTPL'
   export SAIGE_DEV_PASS="<dev 계정 PW>"
 ENVTPL
 
-# ── 4. 검증 (resolver 3종) ──
+# ── 4. 검증 ──
 echo "▶ 검증"
+
+# Figma MCP — ★ 가장 기본 전제 (Figma 데스크톱 Dev Mode MCP 서버)
+if curl -s -o /dev/null --max-time 3 http://127.0.0.1:3845/sse 2>/dev/null; then
+  echo "  ✅ Figma Dev Mode MCP 서버 응답 (127.0.0.1:3845)"
+else
+  echo "  ⚠️  Figma Dev Mode MCP 서버 미응답 — 퍼블리싱 불가!"
+  echo "      → Figma 데스크톱 앱에서 Dev Mode MCP server 활성화 (Dev/Full seat 필요)"
+  echo "      → claude mcp add --transport sse figma http://127.0.0.1:3845/sse"
+fi
+
 ok=0
 node "$REPO_DIR/saige-ds-figma-to-vex/icon-resolve.mjs" corner_fit >/dev/null 2>&1 \
   && { echo "  ✅ icon-resolve"; ok=$((ok + 1)); } \

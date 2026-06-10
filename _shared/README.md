@@ -16,9 +16,21 @@ Figma 시안을 SAIGE 코드(design-system / safety-frontend)로 **반자동 퍼
 
 ## 전제조건
 
-1. Claude Code + Figma MCP 연결
-2. 리포 클론: `design-system`, `safety-frontend`
-3. design-system에 의존성 설치 (`pnpm install`) — `@saige-ai/icons` 필요 (아이콘 resolver 권위 소스)
+### 0. Figma MCP 연동 — ★ 가장 기본 전제 (이게 없으면 아무것도 시작 안 됨)
+
+모든 퍼블리싱은 Figma 핸드오프에서 출발한다(scanner·figma-to-vex/emotion·visual-verify 전부 `mcp__figma__*` 사용). 스킬이 쓰는 서버는 **`figma` = `http://127.0.0.1:3845/sse`** — **Figma 데스크톱 앱의 Dev Mode MCP 서버**다.
+
+설정 순서:
+1. **Figma 데스크톱 앱** 설치 + 로그인 (MCP 서버가 앱 *안에서* 돈다)
+2. **Dev Mode MCP 서버 활성화** (Figma 메뉴 → Preferences → "Enable Dev Mode MCP server"). ⚠️ **Dev Mode 접근 가능한 시트(Pro/Org의 Dev·Full seat) 필요** — 비저자 최대 진입장벽
+3. **Claude Code에 등록**: `claude mcp add --transport sse figma http://127.0.0.1:3845/sse`
+4. **확인**: `claude mcp list` → `figma: ... ✓ Connected`
+
+> 참고: 호스티드 옵션(`https://mcp.figma.com/mcp`)도 있으나 OAuth 인증 별도. 이 스킬은 로컬(127.0.0.1:3845) 기준.
+
+### 나머지 전제
+1. 리포 클론: `design-system`, `safety-frontend`
+2. design-system에 의존성 설치 (`pnpm install`) — `@saige-ai/icons` 필요 (아이콘 resolver 권위 소스)
 
 ## 설치 (권장 — `install.sh`)
 
