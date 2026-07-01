@@ -107,7 +107,7 @@ Phase 0 (route)  → { track, submode, figmaNodes }
 
 ### 게이트 (Phase 4–6, 우회 불가)
 
-1. **visual-verify 게이트** — 평균 ≥ 90% AND 모든 cell ≥ 80%. 미달 시 LLM 패치 loop. self-eval append는 본인 판단 없이 자동.
+1. **visual-verify 게이트** — 픽셀 점수 평균 ≥ 90% AND 모든 cell ≥ 80% **AND 6게이트 하네스 통과**(진실원천·계층 전수 diff·상태 매트릭스·메커니즘 충실도·토큰 해석·완전성 비평 — [[saige-product-visual-verify]] v0.5). **`avgScore`만으로 통과 금지, 게슈탈트("맞아 보임") done 금지** — 커버리지 회계("요소 N중 M확인, 미확인 X") 없으면 미통과. 미달 시 LLM 패치 loop. self-eval append는 본인 판단 없이 자동. 근거: 홈대시보드 데모가 픽셀 점수는 통과했는데 상태·인터랙션·토큰 갭 10라운드([[feedback-publisher-fidelity-retro]]).
 2. **premerge 게이트** — 시안 정합 실측 vs 자칭 갭 체크. 과대 평가(+10%p↑)면 경고.
 3. **saige-pr-create 게이트** — Figma 캡쳐 + 구현 캡쳐 + **사용자 시각 승인** → 토큰 발급 → `gh`/`az pr create`. PreToolUse hook(`~/.claude/hooks/pre-pr-create-check.sh`)이 토큰 없으면 차단. **본인 우회 X** ([[feedback-workflow-violations]]).
 
@@ -172,4 +172,5 @@ Phase 0 (route)  → { track, submode, figmaNodes }
 
 ## 변경 이력
 
+- v0.2 (2026-07-01): visual-verify 게이트를 `avgScore` 단독 → **6게이트 하네스 통과 + 커버리지 회계** 병행으로 강화(게슈탈트 done 금지). 홈대시보드 데모 10라운드 회고 반영([[feedback-publisher-fidelity-retro]]).
 - v0.1 (2026-06-09): 빈 디렉토리(6/8 생성)에 라우터·오케스트레이터 초안 작성. Phase 0 라우팅(트랙 판별 + Product 서브모드 + 할루시네이션 게이트) + Phase 1–6 통합 파이프라인 + 게이트 3종 + 사람 개입 3곳 정의. 15 skills 위 단일 진입점.

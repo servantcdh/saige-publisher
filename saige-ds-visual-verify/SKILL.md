@@ -27,6 +27,19 @@ Figma 시안과 Storybook 구현 사이의 시각 정합도를 픽셀 단위로 
 
 본인 자동 호출 누락 시 = G19 위반 = 본인 신뢰도 추가 감점.
 
+## ★ 시안 정합 하네스 6게이트 (v0.5, 2026-07-01 회고 반영)
+
+픽셀 diff 점수(`avgScore`)만으로 done 선언 금지. 아래 6게이트를 **픽셀 diff 위에 필수로** 얹는다. 게이트 정의 원본·상세는 Product 변형 [[saige-product-visual-verify]]에 있고(홈대시보드 10라운드 실패 회고 [[feedback-publisher-fidelity-retro]]), DS는 Storybook 기준으로 다음처럼 적용:
+
+1. **진실원천 해석** — 값 추측 금지. Figma 변수(`get_variable_defs`)·컴포넌트 소스·DS 토큰 정의처를 읽어 확정.
+2. **계층 전수 computed-style diff** — 픽셀뿐 아니라 요소별 computed style(radius·shadow·border·font·gap)을 래퍼~잎 전 계층 대조. 실행 도구 `~/.claude/skills/_shared/style-fidelity/`(타깃 URL=Storybook story, 레퍼런스=Figma 추출 spec).
+3. **상태 매트릭스** — 정적 1스토리로 끝내지 말고 **story args/controls로 상태 전개**(default/hover/active/disabled/focus/loading/empty). variant cell마다 상태 조합을 story로 커버.
+4. **메커니즘 충실도** — 시각만 흉내낸 짝퉁 금지. DS 프리미티브/토큰을 실제로 씀.
+5. **토큰 해석 체크** — 시안 토큰이 타깃 테마(라이트/다크 `themeClass`)에서 해석되는지 확인. 미해석 var 금지.
+6. **완전성 비평** — "시안에 있는데 story로 안 띄운 상태·안 해석한 토큰은?" 마지막 패스.
+
+**done 재정의:** 게슈탈트 금지 + 커버리지 회계("cell N중 M확인, 미확인 X"). DS는 라이브 앱·인증이 없어 Product의 auth/show_browser 레시피는 불필요(Storybook Test Runner Playwright 내장).
+
 ## 적용 시점
 
 - 컴포넌트 작업 완료 후 PR 생성 직전 (자동 측정 + 머지 게이트)
