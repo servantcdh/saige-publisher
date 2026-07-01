@@ -258,6 +258,42 @@ test('diff: 선언 상태가 양쪽 모두 없으면 자기모순(absent→absen
   assert.equal(rep.pass, true);   // default 일치 + hover는 양쪽 미수집이라 스킵
 });
 
+// ── base-vs-HEAD 회귀 모드 (visual-diff 통합) ─────────────────
+test('diffStyle: 스타일만 바뀐 회귀 포착 (렌더 동일해도 — 픽셀 맹점)', async () => {
+  const { diffStyle } = await import('./diff.mjs');
+  const before = { nodes: { root: { tag: 'div', props: { borderTopLeftRadius: '4px', color: 'rgb(0,0,0)' } } } };
+  const after = { nodes: { root: { tag: 'div', props: { borderTopLeftRadius: '8px', color: 'rgb(0,0,0)' } } } };
+  const rep = diffStyle(before, after);
+  assert.equal(rep.changed, true);
+  assert.equal(rep.deltas.length, 1);
+  assert.equal(rep.deltas[0].prop, 'borderTopLeftRadius');
+  assert.equal(rep.deltas[0].before, '4px');
+  assert.equal(rep.deltas[0].after, '8px');
+});
+test('diffStyle: 변화 없으면 changed=false (hex==rgb 정규화 재사용)', async () => {
+  const { diffStyle } = await import('./diff.mjs');
+  const before = { nodes: { root: { tag: 'div', props: { backgroundColor: '#262a30' } } } };
+  const after = { nodes: { root: { tag: 'div', props: { backgroundColor: 'rgb(38, 42, 48)' } } } };
+  assert.equal(diffStyle(before, after).changed, false);
+});
+test('diffStyle: 토큰 회귀(before 실색 → after 투명) tokenIssues', async () => {
+  const { diffStyle } = await import('./diff.mjs');
+  const before = { nodes: { 'span[0]': { tag: 'span', props: { backgroundColor: 'rgb(102,199,28)' } } } };
+  const after = { nodes: { 'span[0]': { tag: 'span', props: { backgroundColor: 'rgba(0, 0, 0, 0)' } } } };
+  const rep = diffStyle(before, after);
+  assert.equal(rep.tokenIssues.length, 1);
+  assert.equal(rep.changed, true);
+});
+test('diffStyle: 노드 추가/삭제 회계', async () => {
+  const { diffStyle } = await import('./diff.mjs');
+  const before = { nodes: { root: { tag: 'div', props: {} }, 'span[0]': { tag: 'span', props: {} } } };
+  const after = { nodes: { root: { tag: 'div', props: {} }, 'span[1]': { tag: 'span', props: {} } } };
+  const rep = diffStyle(before, after);
+  assert.deepEqual(rep.removedKeys, ['span[0]']);
+  assert.deepEqual(rep.addedKeys, ['span[1]']);
+  assert.equal(rep.changed, true);
+});
+
 // ── 재정형 이음새(회고 #9 방어) ───────────────────────────────
 test('assembleSpec: fingerprint flat 산출 → diff nested 계약으로 변환', async () => {
   const { assembleSpec } = await import('./diff.mjs');

@@ -138,6 +138,24 @@ process.exit(report.pass ? 0 : 1);
 
 드래그·복잡한 상태를 손으로 확인할 때. ★**hidden이면 렌더 throttle로 React 미마운트 → `show_browser` 먼저**([[publisher-visual-verify-auth-gap]]). 로그인 후 `eval`로 `fingerprint.js`의 `__styleFingerprint({mapElements, props, side})`를 주입해 지문을 받고, 노드에서 `diff.mjs`로 대조.
 
+## 사용법 C — base-vs-HEAD 회귀 모드 (DS visual-diff 통합)
+
+앞의 A·B가 **spec-conformance**(구현 vs 시안, map 필요)라면, 이 모드는 **회귀**(base 빌드 vs PR 빌드, map 불필요)다. 같은 story의 base·HEAD 지문을 구조 키로 대조 → **픽셀 diff가 못 잡는 "렌더는 같은데 computed-style만 바뀐" 변경**(토큰 값 교체 등)을 잡는다. DS `visual-diff` 파이프라인은 이미 base·HEAD를 각각 Playwright로 캡처하므로, 그 캡처 세션에 지문 추출만 얹으면 픽셀 diff와 병렬로 공짜로 따라온다.
+
+```js
+// 캡처 시 (base·HEAD 각각): screenshot 직후 같은 page에서
+const tree = await page.evaluate(styleFingerprintTree, { root: '#storybook-root', props: FINGERPRINT_PROPS });
+writeFileSync(`${outDir}/${theme}/${id}.style.json`, JSON.stringify(tree));
+
+// diff 시 (같은 id·theme의 before/after):
+import { diffStyle } from '.../diff.mjs';
+const styleDelta = diffStyle(beforeTree, afterTree); // → { changed, deltas:[{key,prop,before,after}], tokenIssues, added/removedKeys }
+```
+
+- `styleFingerprintTree`(fingerprint.js)가 root 서브트리를 구조 키(`tag[nth]/…`)로 전수 순회 → 스타일만 바뀐 노드가 base/HEAD에서 같은 키로 매칭.
+- `diffStyle`(diff.mjs)은 `compareValue` 정규화를 **그대로 재사용**(hex↔rgb 등 동일 규칙). 순수 함수 → 테스트됨.
+- ⚠️ **통합 함정:** visual-diff 뷰어의 "interesting" 필터가 `status !== 'unchanged'`(픽셀 기준)면 **style-only 변경이 통째로 누락**된다. `styleDelta.changed`를 OR로 넣어야 이 모드의 가치가 산다.
+
 ## 9-패턴 커버리지 맵 (회고 대비)
 
 | # | 회고 실패 패턴 | 이 하네스가 잡는가 | 방식 |

@@ -42,5 +42,63 @@ export function styleFingerprint(arg) {
   return result;
 }
 
+// ── base-vs-HEAD 회귀 모드 (visual-diff 통합) ──────────────────
+// map 없이 root 서브트리를 전수 순회해 요소별 구조 키 + 지문을 뽑는다.
+// 같은 story의 base/HEAD를 각각 뽑아 diff.mjs의 diffStyle로 대조(같은 셀렉터 공간).
+// 구조 키(tag[nth-of-type] 체인)는 DOM이 동일하면 base/HEAD가 일치 → 스타일만 바뀐 변경 포착.
+// arg = { root: '<selector>', props: [FINGERPRINT_PROPS], maxNodes?: 4000 }
+// 반환 = { matched, count, nodes: { '<key>': { tag, props: {prop: value} } } }
+export function styleFingerprintTree(arg) {
+  const { root: rootSel, props, maxNodes = 4000 } = arg;
+  const root = document.querySelector(rootSel);
+  if (!root) return { matched: false, count: 0, nodes: {} };
+
+  const keyOf = (el) => {
+    if (el === root) return 'root';
+    const parts = [];
+    let node = el;
+    while (node && node !== root) {
+      const parent = node.parentElement;
+      if (!parent) break;
+      const tag = node.tagName.toLowerCase();
+      let idx = 0;
+      for (const sib of parent.children) {
+        if (sib === node) break;
+        if (sib.tagName === node.tagName) idx++;
+      }
+      parts.unshift(`${tag}[${idx}]`);
+      node = parent;
+    }
+    return parts.join('/');
+  };
+
+  const readProps = (el) => {
+    const cs = getComputedStyle(el);
+    const out = {};
+    for (const p of props) {
+      let v = cs[p];
+      if (v == null || v === '') {
+        const kebab = p.replace(/[A-Z]/g, (m) => '-' + m.toLowerCase());
+        v = cs.getPropertyValue(kebab);
+      }
+      out[p] = v == null ? '' : String(v);
+    }
+    return out;
+  };
+
+  const nodes = {};
+  const all = [root, ...root.querySelectorAll('*')];
+  let n = 0;
+  for (const el of all) {
+    if (n >= maxNodes) break;
+    n++;
+    nodes[keyOf(el)] = { tag: el.tagName.toLowerCase(), props: readProps(el) };
+  }
+  return { matched: true, count: n, nodes };
+}
+
 // CommonJS/글로벌 폴백 (chrome MCP eval 문자열로 쓸 때 window에 붙이기)
-if (typeof window !== 'undefined') window.__styleFingerprint = styleFingerprint;
+if (typeof window !== 'undefined') {
+  window.__styleFingerprint = styleFingerprint;
+  window.__styleFingerprintTree = styleFingerprintTree;
+}

@@ -15,7 +15,7 @@
 //     options?: { lengthTol, alphaTol } }
 
 import { readFileSync, writeFileSync } from 'node:fs';
-import { compareValue, expandProps } from './props.mjs';
+import { compareValue, expandProps, FINGERPRINT_PROPS } from './props.mjs';
 
 // ── 순수 코어 ──────────────────────────────────────────────────
 export function diffFingerprints(referenceSpec, targetActual, map, opts = {}) {
@@ -103,6 +103,48 @@ export function diffFingerprints(referenceSpec, targetActual, map, opts = {}) {
     (countMismatch.length ? ` · ⚠️${countMismatch.length} count-mismatch` : '');
 
   return { pass, coverage, mismatches, tokenIssues, summary };
+}
+
+// ── base-vs-HEAD 회귀 모드 (visual-diff 통합) ──────────────────
+// styleFingerprintTree 산출 2개(before/after, 같은 셀렉터 공간)를 구조 키로 대조.
+// 픽셀 diff가 못 잡는 "렌더는 같은데 computed-style만 바뀐" 변경(토큰 교체 등)을 잡는 게 핵심 가치.
+// before/after = { nodes: { '<key>': { tag, props } } }.
+// 반환 = { changed, deltas:[{key,tag,prop,kind,before,after,tokenSuspect}], tokenIssues, addedKeys, removedKeys, summary }
+export function diffStyle(before, after, opts = {}) {
+  const bNodes = (before && before.nodes) || {};
+  const aNodes = (after && after.nodes) || {};
+  const deltas = [];
+  const tokenIssues = [];
+  const addedKeys = [];
+  const removedKeys = [];
+
+  const keys = new Set([...Object.keys(bNodes), ...Object.keys(aNodes)]);
+  for (const key of keys) {
+    const b = bNodes[key];
+    const a = aNodes[key];
+    if (!b) { addedKeys.push(key); continue; }   // HEAD에만 있는 노드
+    if (!a) { removedKeys.push(key); continue; } // base에만 있는 노드
+    const props = new Set([...Object.keys(b.props || {}), ...Object.keys(a.props || {})]);
+    for (const prop of props) {
+      const be = b.props[prop];
+      const ae = a.props[prop];
+      if (be === undefined && ae === undefined) continue;
+      const r = compareValue(prop, be ?? '', ae ?? '', opts); // before=expected, after=actual
+      if (r.tokenSuspect) tokenIssues.push({ key, tag: a.tag, prop, before: r.expected, after: r.actual });
+      if (!r.equal) deltas.push({ key, tag: a.tag, prop, kind: r.kind, before: r.expected, after: r.actual, tokenSuspect: r.tokenSuspect });
+    }
+  }
+
+  const changed = deltas.length > 0 || addedKeys.length > 0 || removedKeys.length > 0;
+  return {
+    changed,
+    deltas,
+    tokenIssues,
+    addedKeys,
+    removedKeys,
+    summary: `${deltas.length} style deltas · ${addedKeys.length} added · ${removedKeys.length} removed nodes` +
+      (tokenIssues.length ? ` · ${tokenIssues.length} token issues` : ''),
+  };
 }
 
 // 재정형 이음새(회고 #9 방어): fingerprint.js flat 산출을 diff 소비 계약으로 변환하는 순수 함수.
