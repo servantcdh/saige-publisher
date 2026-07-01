@@ -210,7 +210,10 @@ function parseArgs(argv) {
 }
 
 function isMain() {
-  return process.argv[1] && process.argv[1].endsWith('diff.mjs');
+  // ESM 정확 판별: 이 모듈이 진입점일 때만 true.
+  // (endsWith('diff.mjs')는 동명 파일 — 예: visual-diff의 diff.mjs — 이 진입점이면
+  //  import된 이 모듈의 CLI가 오발동해 process.exit(2)로 호스트를 죽인다. 회고 #9 이음새.)
+  return import.meta.url === `file://${process.argv[1]}`;
 }
 
 if (isMain()) {
