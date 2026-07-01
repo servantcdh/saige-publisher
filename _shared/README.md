@@ -13,6 +13,7 @@ Figma 시안을 SAIGE 코드(design-system / safety-frontend)로 **반자동 퍼
 | Product 트랙 | `saige-product-{session-start, page-scaffold, feature-patch, figma-to-emotion, qa, visual-verify, handoff}` |
 | 공통 게이트 | `saige-premerge-review`, `saige-pr-create` |
 | 공용 스크립트 | `_shared/{saige-paths, append-self-eval}.mjs`, `saige-ds-figma-to-vex/{icon-resolve, component-resolve}.mjs` |
+| 시각 정합 하네스 | `_shared/style-fidelity/` — 픽셀 diff가 못 잡는 computed-style 차이(radius·그림자·1px·토큰·상태)를 결정론으로 대조. visual-verify 게이트2 실행 도구. dep-free 코어 + `node --test`(38). README 참고 |
 
 ## 전제조건
 
@@ -94,4 +95,5 @@ node _shared/append-self-eval.mjs --ticket TEST --self-claim 90 --measured 88 --
 
 ## 변경 이력
 
+- 2026-07-01: `_shared/style-fidelity/` 하네스 추가(홈대시보드 10R 회고 반영 — 픽셀 diff가 못 잡는 computed-style 차이를 결정론 대조). visual-verify 6게이트 v0.5 + `saige-paths.mjs`에 `styleFidelityDir` export(이식성). 5렌즈+델타 적대검증으로 확립(38 테스트).
 - 2026-06-10: git 저장소화 + 이식성 수술(하드코딩 경로 → `saige-paths.mjs` env/homedir 해석) + 본 README 신설.

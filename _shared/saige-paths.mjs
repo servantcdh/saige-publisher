@@ -19,6 +19,13 @@ export const iconsDts =
   process.env.SAIGE_ICONS_DTS ||
   join(dsRoot, 'node_modules', '@saige-ai', 'icons', 'dist', 'index.d.ts');
 
+/** 스킬 저장소(saige-publisher) 루트 = Claude 스킬 발견 위치. install.sh의 CLAUDE_SKILLS_DIR와 일치. */
+export const skillsRoot = process.env.CLAUDE_SKILLS_DIR || join(home, '.claude', 'skills');
+
+/** style-fidelity 하네스 디렉토리 (dep-free 코어 — 드라이버가 여기서 props/fingerprint/diff import). */
+export const styleFidelityDir =
+  process.env.SAIGE_STYLE_FIDELITY_DIR || join(skillsRoot, '_shared', 'style-fidelity');
+
 /**
  * self-eval 로그 (메모리).
  * Claude Code 프로젝트 슬러그가 사용자/프로젝트별이라 env 우선. 폴백은 동호님 기본값.
