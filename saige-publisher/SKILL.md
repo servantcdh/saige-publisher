@@ -17,6 +17,7 @@ DS 트랙(7) + Product 트랙(7) + 공통(figma-handoff-scanner / saige-pr-creat
 |---|---|
 | **사람 개입 최저** | 자동 라우팅 → 자동 파이프라인. 사람 개입은 (a) 라우팅 모호 시 1회 질문 (b) PR 직전 시각 승인 (c) PD 공유 메시지 최종 검토 — 이 3곳뿐 |
 | **할루시네이션 금지 (★ 최우선)** | 시안이 없거나 부족하면 추정으로 진행 X. 즉시 솔직 보고 + 대기. 라우팅 신호가 약하면 추정 X, 질문 |
+| **충실도 우선 (match 먼저)** | 코드 전 계약 문서화(DOM/Token/Style + 레이어 시 Runtime/Layer/Positioning). border/radius/margin 근사·값 발명·DOM flatten 금지. 먼저 match → report → improve. 상세 [references/fidelity-contract.md](references/fidelity-contract.md) |
 | **객관 측정** | 본인 자칭 X. visual-verify 실측 + self-eval 자동 append([[saige-ds-visual-verify]] 7단계) |
 | **게이트 우회 불가** | visual-verify / premerge-review / saige-pr-create hook 토큰 — 셋 다 통과해야 PR. 본인 우회 X |
 | **트랙 책임 분리** | publisher는 지휘만. 변환/검증 로직은 각 트랙 skill 소유. 중복 구현 X |
@@ -86,12 +87,34 @@ Product로 판별되면 **신설 vs 기존 추가**를 한 번 더 가른다:
 | 5 | 머지 권고 (PD 관점) | `saige-premerge-review` | `saige-premerge-review` (공유) |
 | 6 | PR 생성 + 문서 + PD 공유 | `saige-ds-handoff` | `saige-product-handoff` |
 
+### Phase 2 진입 전 필수 — 충실도 계약 (F1/F2/F3 방어)
+
+시안/데모 소스가 있으면 **일반 React 구현이 아니라 퍼블리싱 복제**로 다룬다. convert 착수 시 [references/fidelity-contract.md](references/fidelity-contract.md)의 **실행 지시문을 그대로 채택**하라. 목표 4종: ① **Pixel-perfect** ② **Token-perfect** ③ **Component-faithful** ④ **Runtime-aware**.
+
+**바로 코드 금지.** 먼저 순서대로 작성:
+`1 Source Interpretation → 2 Component Mapping → 3 DOM Contract → 4 Token Manifest → 5 Style Manifest → 6 Runtime State Contract(런타임 시) → 7 Layer Stack(레이어 시) → 8 Positioning(드롭다운/팝오버/툴팁 시) → 9 Implementation Plan`
+
+이 산출물이 반복된 3대 실패를 사전 봉쇄한다:
+
+| | 실패 | 방어 산출물 (구현 전) |
+|---|---|---|
+| **F1** | border·radius·margin·padding·gap 디테일 드리프트 | Token Manifest + Style Manifest (모든 fidelity-sensitive 값에 행 1개, 근사 프리셋 금지, 토큰명 추측 금지, 토큰은 resolved 값 정확 일치 시만 raw 대체, **DS 컴포넌트 재사용 시 내부 resolved 델타 diff·보고**) |
+| **F2** | 레이어 팝업 내부 레이아웃 붕괴 | Runtime State Contract + Layer Stack + Positioning Manifest (static markup·임의 z-index 금지, outside click·ESC·focus trap·return focus·scroll lock·enter/exit anim 누락 금지) |
+| **F3** | DOM 계층 변형(flatten/merge/reorder/rename) | DOM Contract (노드별 보존 여부 명시) |
+
+**완료 후 출력**: `1 Fidelity Checklist → 2 Design System Compliance Report → 3 Runtime Difference Report(런타임 시) → 4 Difference Report`. 불확실한 값/동작은 추정 금지 → `unconfirmed`. 완성 섣불리 선언 금지.
+
+> **먼저 match, 그다음 report, 그다음에만 improve.** 계약이 사후 6게이트 하네스(Phase 4)의 구현 전 짝이다 — 사전 계약이 사후 실측을 통과시킨다. 매핑·템플릿·합리화 차단표는 계약 문서에.
+
 ### 단계 간 산출물 계약 (요약)
 
 ```
 Phase 0 (route)  → { track, submode, figmaNodes }
   ↓
 1 scanner        → variantMatrix.json  (cell별 propValues/nodeId/figmaImageUrl)
+  ↓
+1.5 계약(구현 전) → DOM Contract / Token·Style Manifest / (레이어 시)Runtime·Layer·Positioning
+                   → references/fidelity-contract.md, 코드 전 필수 (F1/F2/F3 방어)
   ↓
 2 convert        → 생성 파일 (DS 4파일 / Product 페이지·patch)
   ↓
@@ -162,6 +185,7 @@ Phase 0 (route)  → { track, submode, figmaNodes }
 - DS 트랙: [[saige-ds-session-start]] · `saige-ds-figma-to-vex` · `saige-ds-qa` · [[saige-ds-visual-verify]] · `saige-premerge-review` · `saige-ds-handoff`
 - Product 트랙: `saige-product-session-start` · `saige-product-page-scaffold` · `saige-product-feature-patch` · `saige-product-figma-to-emotion` · `saige-product-qa` · `saige-product-visual-verify` · `saige-product-handoff`
 - 공통 게이트: `saige-pr-create` (PR 강제 5단계 + hook)
+- 구현 전 계약: [references/fidelity-contract.md](references/fidelity-contract.md) (DOM/Token/Style/Runtime/Layer/Positioning 매니페스트 — F1/F2/F3 방어)
 
 ## 관련 메모리
 
@@ -172,5 +196,7 @@ Phase 0 (route)  → { track, submode, figmaNodes }
 
 ## 변경 이력
 
+- v0.3.1 (2026-07-06): 실행 지시문 바인딩을 control-vs-treatment 마이크로테스트(각 5회, 블라인드 심판)로 실측 — 매니페스트 작성 0%→100%, F1 2.8→4.6, F3 flatten 20%→0%, faithful 20%→80%로 지시문 효과 확인. 유일 잔존 누수(**DS 재사용 컴포넌트의 내부 resolved 델타**: 메뉴 radius 8→4·z-index 40→100·anim 120→150ms가 재사용 뒤에 은닉, 근사 토큰이 정확 hex 스왑)를 닫는 규칙 추가 — "DS 재사용 시 내부 스타일 diff 필수" + "토큰은 resolved 정확 일치 시만 raw 대체" + Design System Compliance Report에 'DS 내부 델타' 행.
+- v0.3 (2026-07-06): 구현 전 **충실도 계약**(references/fidelity-contract.md) 편입. react 스캐폴드 퍼블리싱의 3대 실패 — F1 디테일 드리프트(border/radius/margin 근사), F2 레이어 팝업 붕괴, F3 DOM 계층 변형 — 을 DOM/Token/Style/Runtime/Layer/Positioning 매니페스트로 사전 봉쇄. Phase 1.5로 배선(convert 직전 필수). 범용 fidelity 방법론을 SAIGE 스택(vanilla-extract/emotion/사내 DS)에 맞춰 재작성. 계약 문서에 **실행 지시문**(convert 착수 시 채택하는 명령 척추: 목표 4종 Pixel/Token/Component/Runtime-perfect + 산출물 9 + 완료 후 출력 4종[Fidelity Checklist / Design System Compliance Report / Runtime Difference Report / Difference Report] + `unconfirmed` 규칙) 추가.
 - v0.2 (2026-07-01): visual-verify 게이트를 `avgScore` 단독 → **6게이트 하네스 통과 + 커버리지 회계** 병행으로 강화(게슈탈트 done 금지). 홈대시보드 데모 10라운드 회고 반영([[feedback-publisher-fidelity-retro]]).
 - v0.1 (2026-06-09): 빈 디렉토리(6/8 생성)에 라우터·오케스트레이터 초안 작성. Phase 0 라우팅(트랙 판별 + Product 서브모드 + 할루시네이션 게이트) + Phase 1–6 통합 파이프라인 + 게이트 3종 + 사람 개입 3곳 정의. 15 skills 위 단일 진입점.
